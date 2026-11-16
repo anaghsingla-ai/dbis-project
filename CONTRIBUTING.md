@@ -1,6 +1,6 @@
 # Four-member contribution layout
 
-The shared application/schema baseline stays common to everyone. Each person owns one module directory so SQL changes are isolated and PRs are easy to review. Do not split or duplicate the entire project into four copies.
+This repository is the shared DBIS SQL submission. The complete CampusHire application source used for compatibility reference is at https://github.com/anaghsingla-ai/campushire. Each person owns one SQL module directory in this repo so changes are isolated and PRs are easy to review. Do not split or duplicate the entire project into four copies.
 
 | Owner | Module directory | Schema ownership | Procedures | Triggers |
 |---|---|---|---|---|
@@ -11,7 +11,7 @@ The shared application/schema baseline stays common to everyone. Each person own
 
 Each module should contain three focused SQL files: one for its table definitions, one for its procedures, and one for its triggers. Anagh's committed filenames are the naming example. Teammates should keep all their work under their assigned module directory. Do not edit another owner's module without coordinating first.
 
-The module schema files are contribution slices, not standalone full application schemas. Install the full shared schema and support tables before testing all modules. Preserve procedure names, parameter order/types, result columns, enums, foreign keys, and behavior used by the CampusHire app. Coordinate changes where modules interact, especially Anagh's T8 eligibility updates, Bhuvaneesh's application state, and Jay's round/offer rules.
+The module schema files are contribution slices, not standalone full application schemas. Use the complete CampusHire SQL/app source as your compatibility reference and install its full shared schema and support tables before integration tests. Preserve procedure names, parameter order/types, result columns, enums, foreign keys, and behavior used by the app. Coordinate changes where modules interact, especially Anagh's T8 eligibility updates, Bhuvaneesh's application state, and Jay's round/offer rules.
 
 ## Fork and pull request steps
 
@@ -23,7 +23,7 @@ The module schema files are contribution slices, not standalone full application
 3. Add or edit only your files under your assigned `database/modules/<owner>/` folder. Add focused SQL tests or test notes for your module.
 4. Check `git status` and inspect the diff. Never add `.env`, database data directories, private keys/certificates, logs, caches, virtual environments, or build output.
 5. Commit under your own GitHub account, then push your branch to your fork:
-   `git add database/modules/<owner> tests`
+   `git add database/modules/<owner>`
    `git commit -m "Implement <module> database work"`
    `git push -u origin YOUR-NAME/your-module`
 6. On GitHub, open a pull request with the **base repository** `anaghsingla-ai/dbis-project`, base branch `main`, and your fork branch as the head. Describe changes and the tests actually run. The repository owner reviews and merges the PR.
