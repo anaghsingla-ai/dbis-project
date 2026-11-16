@@ -1,0 +1,8 @@
+=================================================================
+ CampusHire Python Flask REST API Server running on port 5000
+ Database: MySQL 8.0 on 127.0.0.1:3306 (CampusHire_Website_Demo_20261112)
+ Connectivity: mysql-connector-python with Connection Pooling
+ Frontend: React + Vite on http://localhost:5173
+=================================================================
+ * Serving Flask app 'app'
+ * Debug mode: off
