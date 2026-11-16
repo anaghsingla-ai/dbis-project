@@ -31,3 +31,15 @@ CREATE TABLE Student (
  CONSTRAINT fk_student_dept FOREIGN KEY (dept_id)
  REFERENCES Department(dept_id) ON UPDATE CASCADE ON DELETE SET NULL
 );
+
+-- Required by student/application/offer audit triggers in 04_student_triggers.sql
+CREATE TABLE IF NOT EXISTS Audit_Log (
+ audit_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ table_name VARCHAR(64) NOT NULL,
+ record_id BIGINT NOT NULL,
+ field_name VARCHAR(64) NOT NULL,
+ old_value VARCHAR(255),
+ new_value VARCHAR(255),
+ changed_by VARCHAR(255) NOT NULL,
+ changed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
