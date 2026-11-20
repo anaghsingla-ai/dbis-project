@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+/* ─── Ultra-Premium High-Tech SaaS Cyber-Navy Design Tokens ──────────────── */
+:root {
+  /* Futuristic Cyber Palette */
+  --bg-primary: #070B14;
+  --bg-secondary: #0A0F1E;
+  --bg-card: rgba(13, 21, 38, 0.78);
+  --bg-card-hover: rgba(17, 28, 51, 0.9);
+  
+  /* Neon Accents */
+  --neon-cyan: #06B6D4;
+  --neon-cyan-glow: #22D3EE;
+  --neon-blue: #2563EB;
+  --neon-blue-light: #38BDF8;
+  --neon-teal: #14B8A6;
+  --neon-emerald: #10B981;
+  --neon-purple: #8B5CF6;
+  
+  /* Borders */
+  --border-subtle: rgba(56, 189, 248, 0.12);
+  --border-cyan-glow: rgba(6, 182, 212, 0.35);
+  
+  /* Typography */
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+}
+
+/* ─── Base Styles ────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #070B14;
+    color: #F8FAFC;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #070B14;
+    color: #F8FAFC;
+    min-height: 100vh;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: #FFFFFF;
+  }
+}
+
+/* ─── Custom Cyber Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #070B14;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.55);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+}
+
+/* ─── High-Tech Glass & Neon Utilities ────────────────────────────────────── */
+
+/* Glass card cyber style */
+.cyber-card {
+  background: rgba(13, 21, 38, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 189, 248, 0.14);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cyber-card:hover {
+  border-color: rgba(6, 182, 212, 0.35);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.12);
+}
+
+/* Glowing Neon Borders */
+.neon-border-cyan {
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.15), inset 0 0 15px rgba(6, 182, 212, 0.05);
+}
+
+.neon-border-blue {
+  border: 1px solid rgba(37, 99, 235, 0.4);
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.2), inset 0 0 15px rgba(37, 99, 235, 0.05);
+}
+
+/* Glowing Button Effects */
+.btn-neon-blue {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  color: #FFFFFF;
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-neon-blue:hover {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-neon-cyan {
+  background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+  color: #FFFFFF;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-neon-cyan:hover {
+  background: linear-gradient(135deg, #22D3EE 0%, #06B6D4 100%);
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.55);
+  transform: translateY(-1px);
+}
+
+/* Active Nav Glow matching reference screenshot */
+.nav-pill-active {
+  background: #1E6BFF;
+  color: #FFFFFF;
+  box-shadow: 0 0 25px rgba(30, 107, 255, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  font-weight: 600;
+}
+
+/* Neon Text Gradients */
+.gradient-text-cyan {
+  background: linear-gradient(135deg, #22D3EE 0%, #06B6D4 50%, #3B82F6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-teal {
+  background: linear-gradient(135deg, #2DD4BF 0%, #06B6D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle Glowing Background Gradients */
+.bg-cyber-radial {
+  background-color: #070B14;
+  background-image:
+    radial-gradient(at 10% 20%, rgba(6, 182, 212, 0.12) 0px, transparent 40%),
+    radial-gradient(at 90% 10%, rgba(37, 99, 235, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 85%, rgba(20, 184, 166, 0.08) 0px, transparent 45%);
+}
+
+.bg-cyber-mesh {
+  background-color: #070B14;
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Pulse animation for map hubs */
+@keyframes cyberPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
+  70% { transform: scale(1.15); box-shadow: 0 0 0 12px rgba(6, 182, 212, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+}
+
+.beacon-pulse {
+  animation: cyberPulse 2.2s infinite;
+}
+
+/* Animated flow for map arcs */
+@keyframes dashFlow {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+.flow-arc {
+  stroke-dasharray: 6, 6;
+  animation: dashFlow 1.8s linear infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.animate-fadeInUp {
+  animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Input cyber styles */
+.input-cyber {
+  background: rgba(10, 17, 33, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  color: #F8FAFC;
+  transition: all 0.2s ease;
+}
+.input-cyber:focus {
+  border-color: rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+  outline: none;
+}
+
+/* Selection */
+::selection {
+  background: rgba(6, 182, 212, 0.3);
+  color: #FFFFFF;
+}
