@@ -1,26 +1,28 @@
-# Local secrets and configuration
+# Local configuration and credentials
 .env
 .env.*
 !.env.example
 *.pem
 *.key
+.aws/
+.codex/
+.agents/
 
-# Python environments and generated files
-.venv/
-venv/
-__pycache__/
-*.py[cod]
-.pytest_cache/
-
-# JavaScript dependencies and build output
-node_modules/
-dist/
-
-# Local database files, logs, and editor state
+# Database runtime files (source SQL stays tracked)
 database/data/
+campushire-sql-5c018027f58141d6bbe7beae997cb2f8/
 *.ibd
 *.sdi
 *.pid
+
+# Dependencies and generated output
+.venv/
+venv/
+node_modules/
+dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
 *.log
 tmp/
 .DS_Store
