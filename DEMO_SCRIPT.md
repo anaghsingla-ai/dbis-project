@@ -61,7 +61,7 @@
    - Show how Trigger `TR4` automatically captured the old and new CGPA values into `Audit_Log`.
 3. Click **Academic Audit** from the sidebar to inspect the live audit log table.
 4. Explain **Deadlock Prevention in T9:**
-   - *"When transferring between departments, we lock departments in ascending `dept_id` order using `LEAST(dept_a, dept_b)` and `GREATEST(dept_a, dept_b)`, preventing deadlock cycles under concurrent transfers."*
+   - *"When transferring between departments, we lock departments in ascending `dept_id` order using `ORDER BY dept_id ... FOR UPDATE`, which is intended to reduce circular waits."*
 
 ---
 
@@ -69,8 +69,9 @@
 1. Login back as **Admin**:
 2. Navigate to **Placement Reports**:
    - Explain Procedure `T10` (`sp_placement_report`):
-   - Executes `START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY`, generating summary metrics, company placements, and department breakdowns without taking a single write lock.
-3. Show that the entire database can be reset back to pristine demo state at any moment via the **Reset Database to Clean State** button in the DBMS Lab.
+   - Executes `START TRANSACTION`, generating summary metrics, company placements, and department breakdowns using plain SELECT queries. It does not explicitly request READ ONLY or WITH CONSISTENT SNAPSHOT.
+3. Explain that the current bootstrap refuses an existing CampusHire database. Prepare a fresh disposable instance for a clean demonstration; do not promise that the reset button overwrites an existing database.
 
 
 Demo account buttons select a username only. Enter the password configured in your local database and click **Sign in**. Passwords are not stored in the frontend.
+

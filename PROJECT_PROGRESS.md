@@ -88,5 +88,8 @@
 | Step 9 | T6: Student accepts offer; One-Offer policy and duplicate application closure enforced | **PASSED** |
 | Step 10 | T8: Coordinator updates student CGPA; TR4 audit trail generated automatically | **PASSED** |
 | Step 11 | T9: Deadlock-free department transfer with headcount balance synchronization | **PASSED** |
-| Step 12 | T10: Placement report consistent snapshot generation (dept-wise & company-wise) | **PASSED** |
+| Step 12 | T10: Placement report report result-set generation (dept-wise & company-wise) | **PASSED** |
 | Step 13 | Coordinator departments listing endpoint for transfer modal | **PASSED** |
+
+
+Current verification: see `TEST_REPORT.md` for the 20 November 2026 check. Older PASSED/VERIFIED entries are historical records, not a fresh integration run. No current full-suite MySQL pass is claimed.

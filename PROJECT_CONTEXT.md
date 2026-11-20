@@ -194,7 +194,7 @@ Each procedure reports an invalid request with `SIGNAL SQLSTATE '45000'`. Keepin
 - **T9: `sp_transfer_student_dept(p_roll, p_new_dept)`**:
   Locks student, locks both source and destination departments in ascending `dept_id` order (preventing deadlock cycles), updates `dept_id`. TR4 adjusts headcounts (-1 old, +1 new).
 - **T10: `sp_placement_report()`**:
-  Executes `START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY;` returning 3 consistent result sets:
+  Executes `START TRANSACTION;` returning 3 placement report result sets; read-view consistency depends on session isolation:
   1. Placed student count, average, max, and min package.
   2. Company-wise placements and average packages.
   3. Department-wise total students, placed students, and placement percentage.
@@ -236,3 +236,4 @@ Each procedure reports an invalid request with `SIGNAL SQLSTATE '45000'`. Keepin
 8. **T8 Academic Record Propagation**: A drop in CGPA triggers automatic re-evaluation of open applications, setting newly ineligible applications to `Rejected` and writing old/new values to `Audit_Log`.
 9. **T9 Department Transfer**: Updates headcounts in both old and new departments and updates student `dept_name` safely without deadlocks.
 10. **T10 Read-Only Placement Snapshot**: Generates consistent multi-result metrics without taking intrusive locks.
+

@@ -1,5 +1,35 @@
 # CampusHire — Automated Test Execution Report
 
+## Current verification on 20 November 2026
+
+The current test suite collects **67 tests**. A missing `import os` in `tests/test_concurrency.py` was fixed so collection can complete.
+
+| Check | Observed result |
+|---|---|
+| `python -m pytest tests --collect-only -q` | 67 tests collected successfully |
+| `python -m pytest tests/test_application_progress.py tests/test_round_creation_validation.py tests/test_selection_workflow.py -q` | 43 passed in 0.25 seconds |
+| Remaining integration tests | 24 tests not rerun; MySQL at 127.0.0.1:3307 was unavailable |
+
+The 43 passing tests use mocks or in-memory data. They do not verify MySQL procedures, trigger execution, locking, crash recovery, or persistence. The remaining 24 require a configured disposable database and seeded accounts. Some fixtures explicitly use a database named `CampusHire`; `TEST_DB_NAME` alone does not isolate every test. Use a dedicated disposable MySQL instance for a full run.
+
+| Current test module | Collected cases |
+|---|---:|
+| Application progress | 9 |
+| Authentication and roles | 7 |
+| Concurrency | 2 |
+| On-Hold workflow | 3 |
+| Stored procedures | 7 |
+| Round creation validation | 25 |
+| Selection workflow | 9 |
+| Triggers | 5 |
+| Total | 67 |
+
+Run the full pytest suite only after configuring its database and seed prerequisites. `run_tests.sh` is a separate SQL demonstration walkthrough, not the pytest suite; it requires an empty disposable instance because its bootstrap refuses an existing `CampusHire` database.
+
+## Historical record from 11 November 2026
+
+The results and timings below were recorded previously in this repository. They are retained as historical claims and were not reproduced during the current verification. They must not be presented as the current 67-test result.
+
 **Test Suite:** CampusHire Full-Stack & Database Verification  
 **Testing Framework:** pytest 9.2.0 (Python 3.14.5)  
 **Database Under Test:** MySQL 8.0.45 (`CampusHire_Test` isolated dataset)  
@@ -55,7 +85,7 @@
 | `test_t6_t7_offer_and_withdrawal_lifecycle` | `sp_issue_offer` (T5), `sp_respond_to_offer` (T6), `sp_withdraw_application` (T7) | Tests One-Offer Policy: Candidate receives 2 offers, accepts Offer 2; Offer 1 auto-declined; competing application auto-withdrawn; second acceptance blocked | **PASSED** | 0.08s |
 | `test_t8_update_academic_record_and_audit` | `sp_update_academic_record` (T8) | Updates student CGPA and backlog count; verifies audit log written by `trg_student_au` (TR4) with old and new values | **PASSED** | 0.02s |
 | `test_t9_deadlock_free_department_transfer` | `sp_transfer_student_dept` (T9) | Performs student transfer between departments; verifies student department updated and both department headcounts updated consistently | **PASSED** | 0.03s |
-| `test_t10_placement_report_consistent_snapshot` | `sp_placement_report` (T10) | Executes placement report with `START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY`; verifies 3 structured result sets | **PASSED** | 0.02s |
+| `test_t10_placement_report_result_sets` | `sp_placement_report` (T10) | Executes placement report and checks 3 structured result sets; does not test concurrent snapshot consistency. The current procedure uses plain START TRANSACTION | **PASSED** | 0.02s |
 
 ---
 
@@ -65,8 +95,8 @@
 | `test_tr6_placed_student_deletion_guard` | `trg_student_bd` (TR6) | Attempts `DELETE FROM Student` for a student with an accepted offer; verified blocked with SQLSTATE 45000 | **PASSED** | 0.02s |
 | `test_tr9_drive_vacancy_reduction_guard` | `trg_drive_bu` (TR9) | Attempts to reduce drive vacancies below offers already accepted; verified blocked with SQLSTATE 45000 | **PASSED** | 0.02s |
 | `test_tr10_drive_deletion_guard` | `trg_drive_bd` (TR10) | Attempts `DELETE FROM Placement_Drive` for a drive with accepted offers; verified blocked with SQLSTATE 45000 | **PASSED** | 0.02s |
-| `test_tr12_closed_application_reopen_guard` | `trg_app_bu` (TR12) | Attempts `UPDATE Application SET status = 'Applied'` on a closed (`Rejected` or `Withdrawn`) application; verified blocked | **PASSED** | 0.02s |
-| `test_tr13_and_tr18_audit_logs` | `trg_offer_au` (TR18), `trg_app_au` (TR13) | Inspects `Audit_Log` table; verifies automated immutable entries recorded for Offer and Application state transitions | **PASSED** | 0.01s |
+| `test_tr12_closed_application_reopen_guard` | `trg_application_bu` (TR12) | Attempts `UPDATE Application SET status = 'Applied'` on a closed (`Rejected` or `Withdrawn`) application; verified blocked | **PASSED** | 0.02s |
+| `test_tr13_and_tr18_audit_logs` | `trg_offer_au` (TR18), `trg_application_au` (TR13) | Inspects `Audit_Log` table; verifies automatically written entries recorded for Offer and Application state transitions | **PASSED** | 0.01s |
 
 ---
 
@@ -85,10 +115,11 @@
 ```
 
 - **Database Stored Procedures Covered:** 10 / 10 (100%)
-- **Triggers Covered:** 15 / 17 (88.2% directly targeted by invariant assertions)
+- **Trigger coverage:** no measured percentage is available; the current SQL defines 20 triggers
 - **Role-Based API Routes Covered:** All 4 role types (Admin, Student, Company HR, Department Coordinator)
 - **ACID Properties Verified:**
   - **Atomicity:** Rollback guards verified for T1, T2, T3, T8, T9.
   - **Consistency:** Triggers enforce zero duplicate offers, zero duplicate round results, zero orphan criteria.
-  - **Isolation:** `START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY` verified in T10; row locks verified in T4, T5, T9.
-  - **Durability:** All test verifications performed directly against persisted MySQL InnoDB disk tables.
+  - **Isolation:** historical concurrency scenarios exercise row-lock behaviour. The T10 test checks result-set structure, not snapshot isolation. T10 uses plain START TRANSACTION.
+  - **Durability:** database-backed checks read committed records; no server restart or crash-recovery durability test is documented.
+

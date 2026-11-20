@@ -32,8 +32,8 @@ $$\text{Eligibility\_Criteria}, \text{Application}, \text{Selection\_Round}, \te
 
 In addition, two administrative support tables were created:
 1. **`Audit_Log`**:
-   $$\text{Audit\_Log}(\underline{\text{log\_id}}, \text{table\_name}, \text{record\_id}, \text{field\_changed}, \text{old\_value}, \text{new\_value}, \text{changed\_at})$$
-   Written exclusively by database triggers (`TR4`, `TR13`, `TR18`).
+   $$\text{Audit\_Log}(\underline{\text{log\_id}}, \text{table\_name}, \text{record\_id}, \text{field\_name}, \text{old\_value}, \text{new\_value}, \text{changed\_by}, \text{changed\_at})$$
+   Written exclusively by database triggers (`TR4`, `TR13`, `TR15b`, `TR18`).
 2. **`User_Account`**:
    $$\text{User\_Account}(\underline{\text{user\_id}}, \text{username}, \text{email}, \text{password\_hash}, \text{role}, \text{full\_name}, \text{student\_id}, \text{officer\_id}, \text{company\_id}, \text{dept\_id})$$
    Enforces authentication and role-based access without modifying the relational schema of the 10 academic entities.
@@ -46,7 +46,7 @@ In addition, two administrative support tables were created:
 - **Problem Addressed:** Department Student Registration (Problem Statement 2.4).
 - **Concurrency Strategy:** Acquires an exclusive lock on the target department row:
   ```sql
-  SELECT total_students FROM Department WHERE dept_id = p_dept_id FOR UPDATE;
+  SELECT dept_name INTO v_dept_name FROM Department WHERE dept_id = p_dept_id FOR UPDATE;
   ```
 - **Atomicity:** If the insert fails (e.g. duplicate email or enrollment number), the transaction rolls back, and trigger `TR3` is undone automatically.
 
@@ -82,7 +82,7 @@ In addition, two administrative support tables were created:
   1. Updates the selected offer to `Accepted`.
   2. Automatically updates all other pending offers for that student to `Declined`.
   3. Automatically updates all other active applications for that student to `Withdrawn`.
-  4. Triggers `TR17` and `TR18` audit the transition.
+  4. `TR17` validates offer transitions; `TR18` audits them. Application changes also fire `TR12` and `TR13`.
 
 ### T7: `sp_withdraw_application`
 - **Problem Addressed:** Application Lifecycle Management (Problem Statement 2.2).
@@ -90,24 +90,28 @@ In addition, two administrative support tables were created:
 
 ### T8: `sp_update_academic_record`
 - **Problem Addressed:** Academic Record Changes & Open Applications (Problem Statement 2.4).
-- **Cascading Re-evaluation:** After updating the student's CGPA or backlog count, the procedure queries all open applications for that student. If the student no longer meets the criteria, the application is automatically transitioned to `Rejected`.
+- **Cascading Re-evaluation:** After updating the student's CGPA or backlog count, the procedure rechecks only applications with status `Applied`, using minimum CGPA and maximum backlogs. Shortlisted applications and percentage/department criteria are not rechecked by T8.
 
 ### T9: `sp_transfer_student_dept`
 - **Problem Addressed:** Deadlock-Free Department Transfer (Problem Statement 2.4).
-- **Deadlock Avoidance Algorithm:** If two students are transferred simultaneously in opposite directions ($A \to B$ and $B \to A$), naïve locking causes a circular wait deadlock. Procedure T9 enforces strict total resource ordering by acquiring locks in strictly ascending `dept_id` order:
+- **Lock ordering:** T9 first locks the student row, then requests department rows in ascending `dept_id` order using the following query. This ordering is intended to reduce circular waits; it does not establish that every possible transaction interaction is deadlock-free.
   ```sql
-  SET v_low_id = LEAST(v_old_dept_id, p_new_dept_id);
-  SET v_high_id = GREATEST(v_old_dept_id, p_new_dept_id);
-  SELECT total_students FROM Department WHERE dept_id IN (v_low_id, v_high_id) FOR UPDATE;
+  SELECT COUNT(*) INTO v_lock FROM (
+    SELECT dept_id FROM Department
+    WHERE dept_id IN (v_old, p_new_dept)
+    ORDER BY dept_id FOR UPDATE
+  ) t;
   ```
 
 ### T10: `sp_placement_report`
 - **Problem Addressed:** NAAC / NBA Placement Accreditation Reporting (Problem Statement 2.5).
-- **Consistent Non-Blocking Snapshot:**
+- **Report transaction:**
   ```sql
-  START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY;
+  START TRANSACTION;
+  -- Three SELECT queries: overall totals, company totals, department totals.
+  COMMIT;
   ```
-  Reads a point-in-time snapshot across all 10 tables without acquiring any shared or exclusive row locks, guaranteeing zero blocking for live student applicants or HR evaluators.
+  T10 performs no writes and uses no explicit locking SELECT. It does not declare `READ ONLY` or `WITH CONSISTENT SNAPSHOT`. Read-view consistency follows the session isolation level; the procedure does not set it.
 
 ---
 
@@ -130,6 +134,8 @@ In addition, two administrative support tables were created:
 | `TR13: trg_application_au` | AFTER UPDATE | Application | Audits application status transitions to `Audit_Log` |
 | `TR14: trg_result_bi` | BEFORE INSERT | Round_Result | Checks that the student passed the previous round |
 | `TR15: trg_result_ai` | AFTER INSERT | Round_Result | Automatically syncs Application status (Pass $\to$ Shortlisted, Fail $\to$ Rejected) |
+| `TR14b: trg_result_bu` | BEFORE UPDATE | Round_Result | Protects finalized outcomes and validates new outcomes |
+| `TR15b: trg_result_au` | AFTER UPDATE | Round_Result | Synchronizes changed results and audits outcome changes |
 | `TR16: trg_offer_bi` | BEFORE INSERT | Offer | Uses direct checks for shortlist, final round, and vacancy |
 | `TR17: trg_offer_bu` | BEFORE UPDATE | Offer | Enforces One-Offer acceptance policy and state machine |
 | `TR18: trg_offer_au` | AFTER UPDATE | Offer | Audits offer status transitions to `Audit_Log` |
@@ -138,11 +144,16 @@ In addition, two administrative support tables were created:
 
 ## 5. Experimental Test Results
 
-The automated integration test suite verified all transactional invariants:
+The historical test report dated 11 November 2026 records the following scenarios. These are historical results, not a new execution of the current integration suite. See `TEST_REPORT.md` for the current collection count and verification status:
 - **Test 1 (T1 Rollback):** Duplicate email caused immediate transaction rollback; `Department.total_students` remained invariant.
 - **Test 2 (T2 Bounds Check):** Drive creation with `min_cgpa = 11.0` aborted atomically; zero orphan rows created.
 - **Test 3 (T3 Eligibility):** Application by student below cutoff halted with signal: *"CGPA below drive minimum"*.
 - **Test 4 (T4 Round Sequencing):** Attempting round 2 without clearing round 1 was refused by procedure T4 and trigger `TR14`.
 - **Test 5 (TR4 Audit Logging):** CGPA update immediately produced a verified row in `Audit_Log`.
 - **Test 6 (TR12 State Machine):** Reverting a `Rejected` application to `Applied` was blocked by trigger `TR12`.
-- **Test 7 (T10 Accreditation):** Returned three simultaneous result sets with complete consistency.
+- **Test 7 (T10 Accreditation):** Returned three report result sets; this assertion does not test isolation across concurrent updates.
+
+
+## Current architecture and eligibility
+
+The current app uses ten core tables plus `Audit_Log` and `User_Account`, ten stored procedures, twenty triggers, and a pool configured with ten connections (with a direct-connection fallback). Eligibility is checked directly in T3 and TR11; the student drive-list query uses SQL CASE expressions. `fn_eligibility_error` belongs to the archived `database/original` implementation and is not installed by the current bootstrap.

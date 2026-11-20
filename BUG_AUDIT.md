@@ -197,7 +197,7 @@ Executed 10-step end-to-end regression test:
 | **T7 `sp_withdraw_application`** | Withdraws application and declines pending offers | Verified: Application status set to Withdrawn; pending offer set to Declined. |
 | **T8 `sp_update_academic_record`** | Updates CGPA/backlogs and re-evaluates eligibility | Verified: Auto-rejects applications where student no longer meets minimum criteria. Audit log written. |
 | **T9 `sp_transfer_student_dept`** | Deadlock-free inter-department student transfer | Verified: Locks departments in ascending `dept_id` order. Simultaneous bidirectional transfers complete without deadlock. |
-| **T10 `sp_placement_report`** | Generates multi-table consistent placement snapshot | Verified: Executes with `START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY`. Summary, company, and department reports returned. |
+| **T10 `sp_placement_report`** | Generates three placement summary result sets | Source review: Executes plain `START TRANSACTION`. The test checks summary, company, and department result sets, not concurrent snapshot consistency. |
 
 ---
 
@@ -213,3 +213,6 @@ Executed 10-step end-to-end regression test:
 | **BUG-06** | `frontend/HrApplicants.jsx` | Medium | Evaluation modal didn't load candidate's existing round status | Added API fetch on modal mount; active/on-hold round auto-selected with warning banner | **FIXED & TESTED** |
 | **BUG-07** | `frontend/ApplicationManagement.jsx` | Medium | Admin evaluation modal lacked lock indicators on finalized rounds | Added lock badges and disabled inputs on finalized Pass/Fail rounds | **FIXED & TESTED** |
 | **BUG-08** | `backend/scripts/setup_user_accounts.py` | High | User_Account table missing in isolated test runs | Script creates table and seeds role accounts with bcrypt passwords across databases | **FIXED & TESTED** |
+
+
+Current verification: see `TEST_REPORT.md` for the 20 November 2026 check. Older PASSED/VERIFIED entries are historical records, not a fresh integration run. No current full-suite MySQL pass is claimed.

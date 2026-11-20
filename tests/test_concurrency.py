@@ -6,6 +6,7 @@ Tests:
 3. Concurrent Offer Responses (Strict One-Offer policy race prevention)
 """
 
+import os
 import time
 import threading
 import mysql.connector

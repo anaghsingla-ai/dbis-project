@@ -74,7 +74,7 @@ All 10 stored procedures were executed against `CampusHire_Test`:
 | **T7** | `sp_withdraw_application` | Application status set to `Withdrawn`, pending offer set to `Declined` | **VERIFIED** |
 | **T8** | `sp_update_academic_record` | Update CGPA/backlogs, trigger logging to `Audit_Log`, automatic rejection of newly-ineligible applications | **VERIFIED** |
 | **T9** | `sp_transfer_student_dept` | Deadlock-free inter-department transfer using ascending lock ordering (`ORDER BY dept_id`), headcount synchronization | **VERIFIED** |
-| **T10** | `sp_placement_report` | Snapshot consistent multi-table analytics executing under `START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY` | **VERIFIED** |
+| **T10** | `sp_placement_report` | Three placement report result sets inside plain `START TRANSACTION`; snapshot behaviour follows session isolation | **VERIFIED** |
 
 ---
 
@@ -120,3 +120,6 @@ cur.execute('SELECT student_id, COUNT(*) FROM Offer WHERE offer_status = \'Accep
 print('Multi-Offer Violations:', cur.fetchall())
 "
 ```
+
+
+Current verification: see `TEST_REPORT.md` for the 20 November 2026 check. Older PASSED/VERIFIED entries are historical records, not a fresh integration run. No current full-suite MySQL pass is claimed.

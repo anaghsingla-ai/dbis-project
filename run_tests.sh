@@ -2,7 +2,14 @@
 # usage: run_tests.sh  (prints a readable log)
 q(){ echo; echo "mysql> $1"; mysql -t CampusHire -e "$1" 2>&1 | grep -v -e '^--------------' -e '^CALL ' -e '^SELECT ' -e '^$' | sed 's/^ERROR [0-9]* (\(.*\)) at line [0-9]*: /ERROR (\1): /'; }
 h(){ echo; echo "=== $1 ==="; }
-for f in 01_schema 02_functions 03_transactions 04_triggers; do mysql < $f.sql; done; mysql < 05_sample_data.sql >/dev/null
+# Use only a disposable MySQL server: this walkthrough writes demo records.
+# The bootstrap refuses an existing CampusHire database; it does not reset it.
+export DB_HOST="${DB_HOST:-127.0.0.1}"
+export DB_PORT="${DB_PORT:-3307}"
+export DB_USER="${DB_USER:-root}"
+mysql(){ command mysql --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" "$@"; }
+# Supply credentials locally through backend/.env and MYSQL_PWD or client config.
+python backend/scripts/init_db.py || exit 1
 
 h "Initial state"
 q "SELECT dept_code,total_students FROM Department;"
@@ -130,3 +137,4 @@ q "SELECT COUNT(*) AS accepted_offers_for_tej FROM Offer WHERE student_id=$TEJ A
 h "T3 closed drive (drive date in the past)"
 mysql CampusHire -e "CALL sp_create_drive(1,1,'Old Drive','x','Full-Time',500000,1,'On-Campus',DATE_SUB(CURDATE(),INTERVAL 3 DAY),6,0,'ALL',NULL,NULL);" >/dev/null
 q "CALL sp_apply_to_drive(4,$(M "SELECT MAX(drive_id) FROM Placement_Drive"));"
+

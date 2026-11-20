@@ -296,7 +296,7 @@ def test_t9_deadlock_free_department_transfer(test_db_conn):
 
     cur.close()
 
-def test_t10_placement_report_consistent_snapshot(test_db_conn):
+def test_t10_placement_report_result_sets(test_db_conn):
     cur = test_db_conn.cursor(dictionary=True)
 
     cur.callproc('sp_placement_report', ())

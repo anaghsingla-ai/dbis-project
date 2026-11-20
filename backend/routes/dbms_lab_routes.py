@@ -79,7 +79,7 @@ TRANSACTIONS_METADATA = [
             {'name': 'p_min12', 'type': 'DECIMAL(5,2)', 'example': 75.00, 'desc': 'Min 12th percentage'}
         ],
         'tables': ['Placement_Drive', 'Eligibility_Criteria'],
-        'triggers': ['TR7 (validate criteria on INSERT)', 'TR8 (validate on UPDATE)'],
+        'triggers': ['TR7 (validate criteria on INSERT)'],
         'locking': 'Foreign keys lock referenced Company and Officer rows'
     },
     {
@@ -108,8 +108,8 @@ TRANSACTIONS_METADATA = [
             {'name': 'p_remarks', 'type': 'VARCHAR(255)', 'example': 'Strong system design skills', 'desc': 'Evaluator remarks'}
         ],
         'tables': ['Round_Result', 'Application (via TR15)'],
-        'triggers': ['TR14 (checks previous round)', 'TR15 (Pass -> Shortlisted, Fail -> Rejected)'],
-        'locking': 'FOR SHARE on Selection_Round; FOR UPDATE on Application'
+        'triggers': ['TR14/TR15 (new result)', 'TR14b/TR15b (On-Hold update)', 'TR12/TR13 (application status changes)'],
+        'locking': 'FOR SHARE on Selection_Round; FOR UPDATE on Application and existing Round_Result'
     },
     {
         'id': 'T5',
@@ -121,8 +121,8 @@ TRANSACTIONS_METADATA = [
             {'name': 'p_drive', 'type': 'INT', 'example': 1, 'desc': 'Placement Drive ID'}
         ],
         'tables': ['Offer'],
-        'triggers': ['TR16 (basic offer checks)', 'TR9 (vacancies cannot be lowered below offers)'],
-        'locking': 'FOR UPDATE on Placement_Drive row to serialize concurrent offer allocations'
+        'triggers': ['TR16 (validates the new offer)'],
+        'locking': 'FOR UPDATE on Placement_Drive and matching Application rows'
     },
     {
         'id': 'T6',
@@ -134,8 +134,8 @@ TRANSACTIONS_METADATA = [
             {'name': 'p_decision', 'type': 'VARCHAR(10)', 'example': 'Accepted', 'desc': 'Accepted or Declined'}
         ],
         'tables': ['Offer', 'Application'],
-        'triggers': ['TR17 (Pending-only state machine; max 1 accepted offer)', 'TR18 (Audit_Log)'],
-        'locking': 'FOR UPDATE on one Student row so offer responses wait their turn'
+        'triggers': ['TR17/TR18 (offer validation and audit)', 'TR12/TR13 (other applications withdrawn on acceptance)'],
+        'locking': 'FOR UPDATE on the selected Offer, then SELECT COUNT(*) over the student offers FOR UPDATE'
     },
     {
         'id': 'T7',
@@ -147,14 +147,14 @@ TRANSACTIONS_METADATA = [
             {'name': 'p_drive', 'type': 'INT', 'example': 3, 'desc': 'Placement Drive ID'}
         ],
         'tables': ['Application', 'Offer'],
-        'triggers': ['TR12 (closed application cannot be reopened)', 'TR13 (Audit_Log)'],
+        'triggers': ['TR12/TR13 (application validation and audit)', 'TR17/TR18 (pending offer declined)'],
         'locking': 'FOR UPDATE on Application'
     },
     {
         'id': 'T8',
         'name': 'sp_update_academic_record',
         'problem': '2.4 Academic Record Changes & Data Silos',
-        'purpose': 'Update CGPA/backlogs. Open applications failing new criteria are auto-rejected; changes audited.',
+        'purpose': 'Update CGPA/backlogs. Applied applications failing CGPA/backlog criteria are auto-rejected; changes audited.',
         'params': [
             {'name': 'p_roll', 'type': 'INT', 'example': 3, 'desc': 'Student Roll No'},
             {'name': 'p_cgpa', 'type': 'DECIMAL(4,2)', 'example': 5.50, 'desc': 'New CGPA'},
@@ -175,7 +175,7 @@ TRANSACTIONS_METADATA = [
         ],
         'tables': ['Student', 'Department (via TR4)'],
         'triggers': ['TR2 (dept_name sync)', 'TR4 (decrement old dept, increment new dept)'],
-        'locking': 'Lock both departments in ascending dept_id order to avoid deadlock cycles'
+        'locking': 'FOR UPDATE on Student, then department locks requested with ORDER BY dept_id FOR UPDATE'
     },
     {
         'id': 'T10',
@@ -445,13 +445,13 @@ def run_preset_scenario():
             return jsonify({
                 'success': True,
                 'scenario_id': scenario_id,
-                'title': 'DEMO 10: Consistent Read-Only Placement Snapshot',
-                'businessRule': 'T10 executes START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY; freezes non-blocking view for accreditation.',
+                'title': 'DEMO 10: Placement Report Transaction',
+                'businessRule': 'T10 executes START TRANSACTION, three plain report SELECT queries, and COMMIT. The session isolation level determines read-view consistency.',
                 'procedure': 'sp_placement_report()',
                 'reportSummary': summary,
                 'companyPlacements': companies,
                 'deptPlacements': depts,
-                'enforcedBy': 'Transaction T10 with Consistent Snapshot isolation'
+                'enforcedBy': 'Transaction T10; session isolation level'
             })
 
         else:
@@ -613,3 +613,4 @@ def reset_database():
         'success': True,
         'message': 'CampusHire database reset to clean state and re-seeded successfully!'
     })
+

@@ -98,8 +98,8 @@ dbisproject/
 | **T6** | `sp_respond_to_offer` | 2.5 One-Offer Conflict Policy | Offer, Application | `FOR UPDATE` on all Offer rows of the student |
 | **T7** | `sp_withdraw_application` | 2.2 Lifecycle Management | Application, Offer | `FOR UPDATE` on Application |
 | **T8** | `sp_update_academic_record`| 2.4 Academic Record Changes | Student, Application, Audit_Log | `FOR UPDATE` on Student |
-| **T9** | `sp_transfer_student_dept` | 2.4 Deadlock Prevention | Student, Department | Ascending `dept_id` order locks (`LEAST`, `GREATEST`) |
-| **T10**| `sp_placement_report` | 2.5 NAAC / NBA Snapshot | Offer, Drive, Company, Dept, Student | `START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY` |
+| **T9** | `sp_transfer_student_dept` | 2.4 Deadlock Prevention | Student, Department | Ascending `dept_id` order locks (`ORDER BY dept_id ... FOR UPDATE`) |
+| **T10**| `sp_placement_report` | 2.5 NAAC / NBA Snapshot | Offer, Drive, Company, Dept, Student | `START TRANSACTION` |
 
 ### Business Rule Checks
 - T3 uses ordinary `SELECT` and `IF` statements to check eligibility before an application.
@@ -113,3 +113,4 @@ dbisproject/
 - **TR11 - TR13:** Application triggers (basic eligibility checks, state-machine preventing closed application reopen, Audit_Log recorder).
 - **TR14 - TR15b:** Round Result triggers (previous-round check, automatic application status sync: Pass $\to$ Shortlisted, Fail $\to$ Rejected).
 - **TR16 - TR18:** Offer triggers (basic offer checks, one-offer acceptance policy enforcement, Audit_Log recorder).
+
