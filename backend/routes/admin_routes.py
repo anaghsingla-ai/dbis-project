@@ -637,7 +637,7 @@ def get_placement_report():
 
     return jsonify({
         'success': True,
-        'message': 'Placement report generated from consistent snapshot via procedure T10 (sp_placement_report)',
+        'message': 'Placement report generated via procedure T10 (sp_placement_report)',
         'report': {
             'summary': summary,
             'companyWise': company_wise,

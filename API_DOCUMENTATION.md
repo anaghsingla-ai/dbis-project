@@ -43,7 +43,7 @@ Authentication: Bearer JWT token in `Authorization: Bearer <token>` header or `t
 - `POST /api/admin/students`: Registers student via procedure **T1** (`sp_register_student`).
 - `POST /api/admin/drives`: Creates drive and criteria atomically via procedure **T2** (`sp_create_drive`).
 - `POST /api/admin/offers`: Issues offer via procedure **T5** (`sp_issue_offer`).
-- `GET /api/admin/reports/placement`: Runs snapshot procedure **T10** (`sp_placement_report`) returning 3 result sets.
+- `GET /api/admin/reports/placement`: Runs report procedure **T10** (`sp_placement_report`) returning 3 result sets.
 - `GET /api/admin/audit-logs`: Fetches trigger-generated records from `Audit_Log`.
 
 ---

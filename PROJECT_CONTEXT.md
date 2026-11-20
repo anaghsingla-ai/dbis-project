@@ -235,5 +235,5 @@ Each procedure reports an invalid request with `SIGNAL SQLSTATE '45000'`. Keepin
 7. **T7 Application Withdrawal**: Withdrawing an application frees any pending offer and prevents further round scheduling.
 8. **T8 Academic Record Propagation**: A drop in CGPA triggers automatic re-evaluation of open applications, setting newly ineligible applications to `Rejected` and writing old/new values to `Audit_Log`.
 9. **T9 Department Transfer**: Updates headcounts in both old and new departments and updates student `dept_name` safely without deadlocks.
-10. **T10 Read-Only Placement Snapshot**: Generates consistent multi-result metrics without taking intrusive locks.
+10. **T10 Placement Report**: Generates three read-only result sets in one transaction without explicit row locks.
 
