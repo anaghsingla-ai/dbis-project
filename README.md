@@ -63,24 +63,24 @@ Frontend runs at: `http://localhost:5173`
 
 ---
 
-## 3. Demo Login Credentials (1-Click Login Available)
+## 3. Demo Accounts
 
-On the login page (`http://localhost:5173/login`), a 1-click **Quick Demo Login** button is provided for every role:
+On the login page (`http://localhost:5173/login`), select a demo account, enter the password configured in your local database, then click **Sign in**. Passwords are not embedded in the frontend.
 
 | Role | Username | Password | Purpose & Description |
 |---|---|---|---|
-| **TPO_ADMIN** | `admin` | `password123` | TPO Administrative Head (Mrs. Kavita Joshi) — Full administrative access & DBMS Lab |
-| **STUDENT** | `aarav` | `password123` | Aarav Sharma (CSE, CGPA 8.50, 0 backlogs) — Eligible for all drives |
-| **STUDENT** | `diya` | `password123` | Diya Verma (CSE, CGPA 7.20, 0 backlogs) |
-| **STUDENT** | `karan` | `password123` | Karan Patel (EE, CGPA 8.00, 1 backlog) |
-| **STUDENT** | `meera` | `password123` | Meera Nair (ME, CGPA 9.10, 0 backlogs) |
-| **STUDENT** | `rohan` | `password123` | Rohan Gupta (CSE, CGPA 6.10, 2 backlogs) — Ineligible for high-cutoff drives |
-| **COMPANY_HR** | `technova_hr` | `password123` | TechNova HR (IT / Software) |
-| **COMPANY_HR** | `dataworks_hr` | `password123` | DataWorks HR (Analytics) |
-| **COMPANY_HR** | `coremech_hr` | `password123` | CoreMech HR (Core Mechanical) |
-| **DEPARTMENT_COORDINATOR** | `cse_coord` | `password123` | Dr. A. Rao (CSE Department Coordinator) |
-| **DEPARTMENT_COORDINATOR** | `ee_coord` | `password123` | Dr. S. Mehta (EE Department Coordinator) |
-| **DEPARTMENT_COORDINATOR** | `me_coord` | `password123` | Dr. P. Nair (ME Department Coordinator) |
+| **TPO_ADMIN** | `admin` | Configured locally | TPO Administrative Head (Mrs. Kavita Joshi) — Full administrative access & DBMS Lab |
+| **STUDENT** | `aarav` | Configured locally | Aarav Sharma (CSE, CGPA 8.50, 0 backlogs) — Eligible for all drives |
+| **STUDENT** | `diya` | Configured locally | Diya Verma (CSE, CGPA 7.20, 0 backlogs) |
+| **STUDENT** | `karan` | Configured locally | Karan Patel (EE, CGPA 8.00, 1 backlog) |
+| **STUDENT** | `meera` | Configured locally | Meera Nair (ME, CGPA 9.10, 0 backlogs) |
+| **STUDENT** | `rohan` | Configured locally | Rohan Gupta (CSE, CGPA 6.10, 2 backlogs) — Ineligible for high-cutoff drives |
+| **COMPANY_HR** | `technova_hr` | Configured locally | TechNova HR (IT / Software) |
+| **COMPANY_HR** | `dataworks_hr` | Configured locally | DataWorks HR (Analytics) |
+| **COMPANY_HR** | `coremech_hr` | Configured locally | CoreMech HR (Core Mechanical) |
+| **DEPARTMENT_COORDINATOR** | `cse_coord` | Configured locally | Dr. A. Rao (CSE Department Coordinator) |
+| **DEPARTMENT_COORDINATOR** | `ee_coord` | Configured locally | Dr. S. Mehta (EE Department Coordinator) |
+| **DEPARTMENT_COORDINATOR** | `me_coord` | Configured locally | Dr. P. Nair (ME Department Coordinator) |
 
 ---
 
@@ -107,13 +107,26 @@ On the login page (`http://localhost:5173/login`), a 1-click **Quick Demo Login*
 
 ## 5. Documentation Links
 
-- [IMPLEMENTATION_PLAN.md](file:///c:/Users/anagh\Downloads/dbisproject/IMPLEMENTATION_PLAN.md): Architectural roadmap and directory structure.
-- [TRANSACTION_MAPPING.md](file:///c:/Users/anagh\Downloads/dbisproject/TRANSACTION_MAPPING.md): Traceability matrix from UI action $\to$ API $\to$ Stored Procedure $\to$ Triggers.
-- [TRIGGER_DOCUMENTATION.md](file:///c:/Users/anagh\Downloads/dbisproject/TRIGGER_DOCUMENTATION.md): Complete specifications for TR1 through TR18.
-- [API_DOCUMENTATION.md](file:///c:/Users/anagh\Downloads/dbisproject/API_DOCUMENTATION.md): Complete REST endpoint catalog.
-- [DEMO_SCRIPT.md](file:///c:/Users/anagh\Downloads/dbisproject/DEMO_SCRIPT.md): Step-by-step 10-minute viva evaluation walkthrough.
-- [REPORT_EXTENSION.md](file:///c:/Users/anagh\Downloads/dbisproject/REPORT_EXTENSION.md): Formal transaction & trigger project report extension.
+- [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md): Architectural roadmap and directory structure.
+- [TRANSACTION_MAPPING.md](TRANSACTION_MAPPING.md): Traceability matrix from UI action $\to$ API $\to$ Stored Procedure $\to$ Triggers.
+- [TRIGGER_DOCUMENTATION.md](TRIGGER_DOCUMENTATION.md): Complete specifications for TR1 through TR18.
+- [API_DOCUMENTATION.md](API_DOCUMENTATION.md): Complete REST endpoint catalog.
+- [DEMO_SCRIPT.md](DEMO_SCRIPT.md): Step-by-step 10-minute viva evaluation walkthrough.
+- [REPORT_EXTENSION.md](REPORT_EXTENSION.md): Formal transaction & trigger project report extension.
 
 ## Classroom explanation
 
 Start with [TRANSACTIONS_TRIGGERS_GUIDE.md](TRANSACTIONS_TRIGGERS_GUIDE.md) for the simplified explanation and [transaction_classroom_examples.sql](transaction_classroom_examples.sql) for ROLLBACK and SAVEPOINT demonstrations. The submitted schema is unchanged.
+
+## Database setup and contributor modules
+
+See [database/SETUP_AND_TESTING.md](database/SETUP_AND_TESTING.md) for the safe install order, module ownership, and manual verification checklist. Keep credentials in local environment configuration; never commit passwords, tokens, or real student data.
+
+## Contributor modules
+
+- **Anagh:** Department and Student schema; T1, T8, T9; student management triggers TR1–TR6.
+- **Arush:** Company, Placement_Officer, Placement_Drive and Eligibility_Criteria; T2; drive/eligibility triggers.
+- **Bhuvaneesh:** Application and Selection_Round workflow; T3 and T7; application triggers.
+- **Jay:** Round_Result and Offer lifecycle; T4–T6 and T10 reporting; result/offer triggers.
+
+Module boundaries describe primary ownership. Coordinate changes to shared SQL files and preserve the app's procedure names, parameter order, result columns, and status values.
